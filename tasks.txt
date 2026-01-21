@@ -1,3 +1,5 @@
+TODO: Implementing rotating residential proxies
+
 Browser and session handling
 	1.	Integrate undetected chromedriver
 Replace standard Selenium driver with undetected chromedriver for browser initialization.
