@@ -1,0 +1,5 @@
+undetected-chromedriver
+selenium-stealth
+humancursor
+python-dotenv
+duckdb
