@@ -1,3 +1,4 @@
+import os
 import time
 import logging
 from selenium.webdriver.common.by import By
@@ -104,24 +105,32 @@ class Workflow:
     def get_elements(self, type) -> list:
         elements = []
         element = self.locator[type]
+        
+        if isinstance(element, dict):
+            element = element.get('primary', element.get('fallback'))
+            
         if self.is_present(element):
             elements = self.browser.find_elements(element[0], element[1])
         return elements
 
     def is_present(self, locator):
+        if isinstance(locator, dict):
+            locator = locator.get('primary', locator.get('fallback'))
+            
         return len(self.browser.find_elements(locator[0], locator[1])) > 0
 
     @retry(max_attempts=5, delay=1)
     def send_resume(self, jobID=None) -> bool:
         def is_present(button_locator) -> bool:
-
+            if isinstance(button_locator, dict):
+                button_locator = button_locator.get('primary', button_locator.get('fallback'))
 
             return len(self.browser.find_elements(button_locator[0], button_locator[1])) > 0
 
         try:
             submitted = False
             loop = 0
-            while loop < 2:
+            while loop < 20: # Increased loop limit for multi-page forms
                 time.sleep(1)
                 # Upload resume
                 if is_present(self.locator["upload_resume"]):
@@ -129,37 +138,42 @@ class Workflow:
                         resume_locator = self.browser.find_element(By.XPATH, "//*[contains(@id, 'jobs-document-upload-file-input-upload-resume')]")
                         resume = self.uploads.get("Resume")
                         if resume:
-                            resume_locator.send_keys(resume)
+                            abs_resume = os.path.abspath(resume)
+                            resume_locator.send_keys(abs_resume)
+                            logger.info(f"Uploaded resume: {abs_resume}", job_id=jobID, step="upload_resume")
                     except Exception as e:
                         logger.error(f"Resume upload failed: {e}", job_id=jobID, step="upload_resume", exception=e)
 
                 # Upload cover letter
-
+                # Upload cover letter
                 if is_present(self.locator["upload_cv"]):
                     cv = self.uploads.get("Cover Letter")
                     if cv:
                         try:
                             cv_locator = self.browser.find_element(By.XPATH, "//*[contains(@id, 'jobs-document-upload-file-input-upload-cover-letter')]")
-                            cv_locator.send_keys(cv)
+                            abs_cv = os.path.abspath(cv)
+                            cv_locator.send_keys(abs_cv)
+                            logger.info(f"Uploaded cover letter: {abs_cv}", job_id=jobID, step="upload_cv")
                         except Exception as e:
                              pass
 
-                elif len(self.get_elements("follow")) > 0:
-                    elements = self.get_elements("follow")
-                    for element in elements:
+                # NEW: Click 'Follow Company' if requested and present
+                follow_elements = self.get_elements("follow")
+                if follow_elements:
+                    for element in follow_elements:
                         try:
-                             button = self.wait.until(EC.element_to_be_clickable(element))
-                             self.human.click(button)
+                            # Only click if it's not already checked (often it's a label for a checkbox)
+                            self.browser.execute_script("arguments[0].click();", element)
+                            logger.info("Clicked 'Follow Company' checkbox", job_id=jobID, step="follow")
                         except: pass
 
                 if len(self.get_elements("submit")) > 0:
-
                     elements = self.get_elements("submit")
                     for element in elements:
                         button = self.wait.until(EC.element_to_be_clickable(element))
                         
                         if self.dry_run and not self.dry_run.validate_submit():
-                             submitted = True # Pretend success for workflow continuity
+                             submitted = True 
                              logger.info("Fake success for dry run", job_id=jobID, step="submit", event="dry_run_success")
                              break
                         
@@ -167,45 +181,39 @@ class Workflow:
                         logger.info("Application Submitted", job_id=jobID, step="submit", event="success")
                         submitted = True
                         if self.metrics: self.metrics.increment("submitted")
-
                         break
-
-
-
+                    
+                    if submitted: break # Exit the WHILE loop immediately
 
                 elif len(self.get_elements("error")) > 0:
+                    logger.warning("⚠️ Form contains errors or missing required fields.", job_id=jobID, step="form_error")
+                    
+                    # Try to solve automatically first (one attempt)
+                    logger.info("Attempting to auto-solve questions...", job_id=jobID, step="auto_solve")
                     elements = self.get_elements("error")
-                    if "application was sent" in self.browser.page_source:
-                        logger.info("Application Submitted", job_id=jobID, step="submit", event="success_after_check")
-                        submitted = True
-                        break
-                    elif len(elements) > 0:
-                        while len(elements) > 0:
-                            logger.info("Please answer the questions, waiting 5 seconds...", job_id=jobID, step="questions")
-                            time.sleep(5)
-
-                            elements = self.get_elements("error")
-                            for element in elements:
-                                self.form_filler.process_questions()
-
-                            if "application was sent" in self.browser.page_source:
-                                logger.info("Application Submitted", job_id=jobID, step="submit", event="success_after_questions")
-                                submitted = True
+                    for element in elements:
+                        self.form_filler.process_questions()
+                    
+                    time.sleep(2)
+                    
+                    # Check if errors still exist
+                    elements = self.get_elements("error")
+                    if len(elements) > 0:
+                        logger.info("🛑 PAUSED: Bot cannot solve these questions. PLEASE SOLVE THEM MANUALLY.", job_id=jobID, step="manual_intervention")
+                        logger.info("⏰ I will wait indefinitely until you clear the errors. You can take as much time as you need.", job_id=jobID, step="waiting")
+                        
+                        # Wait forever until errors are cleared
+                        while len(self.get_elements("error")) > 0:
+                            time.sleep(5) # Just sit and wait
+                            # Check if the job was closed or we navigated away
+                            if "You applied on" in self.browser.page_source or "application was sent" in self.browser.page_source:
                                 break
-                            elif is_present(self.locator["easy_apply_button"]):
-                                logger.info("Skipping application", job_id=jobID, step="process", event="skip")
-                                if self.metrics: self.metrics.increment("skipped")
-                                submitted = False
+                            if is_present(self.locator["easy_apply_button"]):
                                 break
-
-                        continue
-
-                    else:
-                        logger.info("Application not submitted", job_id=jobID, step="submit", event="failed")
-                        if self.metrics: self.metrics.increment("failed")
-                        time.sleep(2)
-                        break
-
+                        
+                        logger.info("✅ Errors cleared! Resuming...", job_id=jobID, step="resuming")
+                    
+                    continue # Try the page again (to click Next or Submit)
 
 
                 elif len(self.get_elements("next")) > 0:

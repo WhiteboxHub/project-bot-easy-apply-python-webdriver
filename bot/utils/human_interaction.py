@@ -72,15 +72,25 @@ class HumanInteraction:
         """
         Moves to element with natural curves and clicks.
         """
-        if self.cursor:
-            try:
+        try:
+            if self.cursor:
+                # Some humancursor versions may have issues with UC WebElements
+                # We try it, but if it fails with type errors we fall back immediately
                 self.cursor.click_on(element)
                 return
-            except Exception as e:
-                logger.warning(f"Human click failed: {e}. Falling back to selenium click.", step="human_click")
+        except Exception:
+            pass # Silent fallback for speed and cleaner logs
         
-        # Fallback
-        element.click()
+        # Standard Selenium click is more reliable across environments
+        try:
+            element.click()
+        except Exception as e:
+            # Last resort: JS click
+            try:
+                self.browser.execute_script("arguments[0].click();", element)
+            except:
+                logger.warning(f"All click methods failed: {e}", step="click_error")
+
 
     def type(self, element, text):
         """

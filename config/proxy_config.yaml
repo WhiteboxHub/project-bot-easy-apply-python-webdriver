@@ -1,0 +1,91 @@
+# Proxy Configuration for Rotating Residential Proxies
+
+proxy:
+  # Enable/disable proxy rotation
+  enabled: false  # Set to true to enable
+  
+  # Proxy provider: brightdata, oxylabs, smartproxy, custom
+  provider: "brightdata"
+  
+  # Rotation Strategy
+  rotation:
+    # Strategy options:
+    # - per_session: Rotate once per bot session (recommended for stealth)
+    # - per_application: Rotate after N applications
+    # - time_based: Rotate every N seconds
+    # - per_candidate: Use different proxy for each candidate
+    strategy: "per_session"
+    
+    # For time_based strategy (seconds)
+    interval: 300
+    
+    # For per_application strategy
+    applications_per_proxy: 5
+  
+  # Proxy Pools
+  # You can define multiple proxy pools and the system will rotate between them
+  pools:
+    # Bright Data Example
+    - name: "brightdata_residential_us"
+      type: "residential"
+      host: "brd.superproxy.io"
+      port: 22225
+      username: "brd-customer-{customer_id}-zone-{zone_name}"
+      password: "{your_password}"
+      country: "US"
+      enabled: true
+    
+    # Oxylabs Example
+    - name: "oxylabs_residential"
+      type: "residential"
+      host: "pr.oxylabs.io"
+      port: 7777
+      username: "customer-{username}-cc-us"
+      password: "{your_password}"
+      country: "US"
+      enabled: false
+    
+    # Smartproxy Example
+    - name: "smartproxy_residential"
+      type: "residential"
+      host: "gate.smartproxy.com"
+      port: 7000
+      username: "{username}"
+      password: "{password}"
+      country: "US"
+      enabled: false
+    
+    # Custom Proxy Example
+    - name: "custom_proxy_1"
+      type: "datacenter"
+      host: "proxy.example.com"
+      port: 8080
+      username: "user"
+      password: "pass"
+      enabled: false
+  
+  # Proxy Health Check
+  health_check:
+    enabled: true
+    url: "https://lumtest.com/myip.json"  # Test URL to verify proxy
+    timeout: 10  # seconds
+    max_failures: 3  # Mark proxy as unhealthy after N failures
+    retry_unhealthy_after: 300  # seconds
+  
+  # Authentication
+  # Some proxies require authentication via username:password@host:port
+  # This is handled automatically based on the pool configuration
+  
+  # Fallback behavior
+  fallback:
+    # If all proxies fail, should we continue without proxy?
+    continue_without_proxy: false
+    
+    # Retry failed proxy after N seconds
+    retry_after: 60
+
+# Environment Variables for Proxy Credentials
+# You can use environment variables instead of hardcoding credentials:
+# PROXY_BRIGHTDATA_PASSWORD=your_password
+# PROXY_OXYLABS_PASSWORD=your_password
+# PROXY_SMARTPROXY_PASSWORD=your_password

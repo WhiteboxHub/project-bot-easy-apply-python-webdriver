@@ -1,6 +1,6 @@
 import time
 import logging
-from selenium.webdriver.common.by import By.
+from selenium.webdriver.common.by import By
 from bot.persistence.store import Store
 from bot.utils.selectors import LOCATORS
 from bot.utils.logger import logger
@@ -116,11 +116,16 @@ class FormFiller:
     def get_elements(self, type) -> list:
         elements = []
         element = self.locator[type]
+        
+        if isinstance(element, dict):
+            element = element.get('primary', element.get('fallback'))
+            
         if self.is_present(element):
             elements = self.browser.find_elements(element[0], element[1])
         return elements
 
     def is_present(self, locator):
-        if isinstance(locator, list):
-             locator = tuple(locator)
+        if isinstance(locator, dict):
+            locator = locator.get('primary', locator.get('fallback'))
+            
         return len(self.browser.find_elements(locator[0], locator[1])) > 0

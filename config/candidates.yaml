@@ -1,0 +1,97 @@
+# Multi-Candidate Configuration
+# Each candidate has their own profile, credentials, and job search preferences
+
+candidates:
+  - id: candidate_001
+    name: "Sunil Kumar"
+    enabled: true
+    
+    # LinkedIn Credentials (can also use .env with CANDIDATE_001_USERNAME format)
+    credentials:
+      email: "your_email@example.com"
+      password: ""  # Leave empty to use .env
+      phone: "1234567890"
+    
+    # Chrome Profile Path (leave empty to use guest mode - no conflicts!)
+    # Guest mode = fresh session each time, no saved cookies
+    # If you want to save login session, specify a profile path
+    profile_path: ""
+    
+    # Resume and Cover Letter
+    uploads:
+      Resume: ./assets/candidates/candidate_001/resume.pdf
+      Cover Letter: ./assets/candidates/candidate_001/cover_letter.pdf
+    
+    # Job Search Parameters
+    search:
+      positions:
+        - Software Engineer
+        - Full Stack Developer
+        - Backend Developer
+      
+      locations:
+        - Remote
+        - Michigan
+        - California
+      
+      salary: 80000
+      rate: 40
+      
+      experience_level:
+        # - 1  # Entry level
+        - 2  # Associate
+        - 3  # Mid-Senior level
+        # - 4  # Director
+        # - 5  # Executive
+        # - 6  # Internship
+    
+    # Application Preferences
+    preferences:
+      max_applications_per_run: 50
+      cooldown_seconds: 5
+      dry_run: true
+      
+      blacklist:
+        # - "Company Name 1"
+        # - "Company Name 2"
+      
+      blacklist_titles:
+        # - "Senior"
+        # - "Lead"
+
+  - id: candidate_002
+    name: "Jane Smith"
+    enabled: false  # Set to true to activate
+    
+    credentials:
+      email: "jane.smith@example.com"
+      password: ""
+      phone: "0987654321"
+    
+    profile_path: ""
+    
+    uploads:
+      Resume: ./assets/candidates/candidate_002/resume.pdf
+    
+    search:
+      positions:
+        - Data Scientist
+        - Machine Learning Engineer
+      
+      locations:
+        - Remote
+        - New York
+      
+      salary: 120000
+      rate: 60
+      
+      experience_level:
+        - 3  # Mid-Senior level
+        - 4  # Director
+    
+    preferences:
+      max_applications_per_run: 10
+      cooldown_seconds: 90
+      dry_run: false
+
+# Add more candidates as needed

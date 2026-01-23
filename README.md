@@ -27,8 +27,9 @@ A robust, stealthy, and modular bot to automate LinkedIn Easy Apply applications
 
 ### 🧩 Architecture
 *   **Modular Design**: Code is split into `bot/core`, `bot/discovery`, `bot/application`, and `bot/persistence` for maintainability.
+*   **Manual Intervention Mode**: If the bot encounters a field it cannot fill, it will **pause indefinitely**, allowing you to fill it manually in the browser. It resumes automatically once the error is cleared.
+*   **Multi-Candidate Support**: Capable of handling multiple profiles via `config/candidates.yaml` and `main_multi.py`.
 *   **Structured Logging**: Machine-parseable logs with `job_id`, `step`, and `event` for easier debugging.
-*   **Metrics**: Prints a session summary (Attempted, Submitted, Failed, Skipped) at the end of every run.
 
 ---
 
@@ -41,28 +42,24 @@ A robust, stealthy, and modular bot to automate LinkedIn Easy Apply applications
 ### 2. Install Dependencies
 ```bash
 pip install -r requirements.txt
+pip install tabulate  # Optional: For viewing database results
 ```
 
 ### 3. Configure Credentials (.env)
-Rename `.env.example` to `.env` and add your details:
+Rename `.env.example` to `.env` and add your details. This file is ignored by Git to keep your data safe.
 ```ini
 LINKEDIN_USERNAME=your_email@example.com
 LINKEDIN_PASSWORD=your_password
 PHONE_NUMBER=1234567890
 ```
-*(You can remove these from `config.yaml` now)*
 
 ### 4. Configure Bot (config.yaml)
-Edit `config.yaml` for job search parameters:
+Edit `config.yaml` for job search parameters and execution speed.
 ```yaml
 execution:
   max_applications_per_run: 10
-  cooldown_seconds: 90
-  dry_run: true  # Set to false to actually apply
-
-uploads:
-  Resume: ./assets/cv.pdf
-  Cover Letter: ./assets/cl.pdf
+  cooldown_seconds: 5  # Time to wait between applications
+  dry_run: true       # Set to false to actually apply
 ```
 *Note: Place your resume and cover letter in the `assets/` folder.*
 

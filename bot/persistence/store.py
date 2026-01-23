@@ -25,9 +25,34 @@ class Store:
                 job VARCHAR,
                 company VARCHAR,
                 attempted BOOLEAN,
-                result BOOLEAN
+                result BOOLEAN,
+                candidate_id VARCHAR DEFAULT 'default',
+                proxy_used VARCHAR DEFAULT NULL
             )
         """)
+        
+        self.con.execute("""
+            CREATE TABLE IF NOT EXISTS candidates (
+                candidate_id VARCHAR PRIMARY KEY,
+                name VARCHAR,
+                email VARCHAR,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        """)
+        
+        self.con.execute("""
+            CREATE TABLE IF NOT EXISTS runs (
+                run_id VARCHAR PRIMARY KEY,
+                candidate_id VARCHAR,
+                started_at TIMESTAMP,
+                completed_at TIMESTAMP,
+                applications_submitted INTEGER DEFAULT 0,
+                applications_failed INTEGER DEFAULT 0,
+                proxy_used VARCHAR,
+                system_id VARCHAR DEFAULT 'local'
+            )
+        """)
+        
         self.con.execute("""
             CREATE TABLE IF NOT EXISTS qa (
                 question VARCHAR UNIQUE,
@@ -66,13 +91,13 @@ class Store:
                 # The old code: df.read_csv(header=None) implies no headers.
                 
                 self.con.execute(f"""
-                    INSERT INTO applications 
+                    INSERT INTO applications (timestamp, job_id, job, company, attempted, result)
                     SELECT column0, column1, column2, column3, column4, column5 
                     FROM read_csv('{out_csv}', header=False, columns={{'column0': 'TIMESTAMP', 'column1': 'VARCHAR', 'column2': 'VARCHAR', 'column3': 'VARCHAR', 'column4': 'BOOLEAN', 'column5': 'BOOLEAN'}})
                 """)
                 out_csv.rename("data/out.csv.bak")
             except Exception as e:
-                 log.warning(f"Applications migration failed: {e}")
+                log.warning(f"Applications migration failed: {e}")
 
 
     def get_appliedIDs(self) -> list | None:
@@ -90,7 +115,7 @@ class Store:
             log.error(f"Failed to fetch jobIDs: {e}")
             return []
 
-    def write_to_file(self, button, jobID, browserTitle, result) -> None:
+    def write_to_file(self, button, jobID, browserTitle, result, candidate_id='default', proxy_used=None) -> None:
         def re_extract(text, pattern):
             target = re.search(pattern, text)
             if target:
@@ -104,8 +129,8 @@ class Store:
         company = re_extract(browserTitle.split(' | ')[1], r"(\w.*)")
         
         try:
-            self.con.execute("INSERT INTO applications VALUES (?, ?, ?, ?, ?, ?)", 
-                             [timestamp, jobID, job, company, attempted, result])
+            self.con.execute("INSERT INTO applications VALUES (?, ?, ?, ?, ?, ?, ?, ?)", 
+                             [timestamp, jobID, job, company, attempted, result, candidate_id, proxy_used])
         except Exception as e:
             log.error(f"Failed to write application to DB: {e}")
 

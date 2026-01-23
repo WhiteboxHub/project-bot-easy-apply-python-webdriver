@@ -1,6 +1,6 @@
-username: <username>
-password: <password>
-phone_number: <phone_number>
+username: "your_email@example.com"
+password: "your_password"
+phone_number: "your_phone_number"
 
 profile_path: '' #can be empty, will default to 'C:\Users\<user>\AppData\Local\Google\Chrome\User Data\Default'
 
@@ -12,6 +12,12 @@ positions:
 locations:
 - Michigan
 - Remote
+
+# --------- Execution Parameters -------
+execution:
+  max_applications_per_run: 50
+  cooldown_seconds: 5
+  dry_run: true # Set to false to actually apply
 
 salary: 60,000
 rate: 25

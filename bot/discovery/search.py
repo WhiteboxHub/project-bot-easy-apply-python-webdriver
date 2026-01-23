@@ -164,9 +164,18 @@ class Search:
     def get_elements(self, type) -> list:
         elements = []
         element = self.locator[type]
+        
+        # Handle new selector format with primary/fallback
+        if isinstance(element, dict):
+            element = element.get('primary', element.get('fallback'))
+        
         if self.is_present(element):
             elements = self.browser.find_elements(element[0], element[1])
         return elements
 
     def is_present(self, locator):
+        # Handle new selector format with primary/fallback
+        if isinstance(locator, dict):
+            locator = locator.get('primary', locator.get('fallback'))
+        
         return len(self.browser.find_elements(locator[0], locator[1])) > 0
