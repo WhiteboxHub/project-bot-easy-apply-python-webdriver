@@ -30,7 +30,7 @@ pip install -r requirements.txt
 
 ## 📊 View Results
 - **CSV Logs**: Check `output/applied_jobs.csv` for application history.
-- **Detailed History**: Run `python app.py` and visit `http://localhost:5000`.
+- **Detailed History**: View the `output/applications.db` using any DuckDB viewer.
 
 ## 📁 More Information
 For a deep dive into advanced features, architecture, and project history, see [PROJECT_ANALYSIS.md](PROJECT_ANALYSIS.md).
