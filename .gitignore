@@ -64,6 +64,7 @@ config/settings.py
 final_token.txt
 token_output.txt
 test_*.py
+*.pdf
 
 # OS
 .DS_Store
