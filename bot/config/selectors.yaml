@@ -1,0 +1,49 @@
+# LinkedIn Automation Selectors
+# This file stores all XPaths and CSS selectors used by the bot.
+# Format: Registry Key -> List of [STRATEGY, SELECTOR]
+
+registry:
+  job_listings:
+    - ["XPATH", "//li[@data-occludable-job-id]"]
+    - ["XPATH", "//div[@data-job-id]"]
+    - ["XPATH", "//li[contains(@class,'jobs-search-results__list-item')]"]
+  apply_button:
+    - ["XPATH", ".//button[contains(@class,'jobs-apply-button') and contains(@class, 'artdeco-button--3') and contains(@aria-label, 'Easy')]"]
+    - ["XPATH", ".//button[contains(span, 'Apply')]"]
+  modal_next:
+    - ["XPATH", ".//button[contains(span, 'Next')]"]
+  modal_submit:
+    - ["XPATH", ".//button[contains(span, 'Submit application')]"]
+  modal_review:
+    - ["XPATH", ".//button[contains(span, 'Review')]"]
+  modal_done:
+    - ["XPATH", ".//button[contains(span, 'Done')]"]
+  modal_discard:
+    - ["XPATH", ".//button[contains(span, 'Discard')]"]
+  login_submit:
+    - ["XPATH", '//button[@type="submit" and (contains(translate(normalize-space(@aria-label), "ABCDEFGHIJKLMNOPQRSTUVWXYZ", "abcdefghijklmnopqrstuvwxyz"), "sign in") or contains(translate(normalize-space(@aria-label), "ABCDEFGHIJKLMNOPQRSTUVWXYZ", "abcdefghijklmnopqrstuvwxyz"), "log in") or contains(translate(normalize-space(.), "ABCDEFGHIJKLMNOPQRSTUVWXYZ", "abcdefghijklmnopqrstuvwxyz"), "sign in") or contains(translate(normalize-space(.), "ABCDEFGHIJKLMNOPQRSTUVWXYZ", "abcdefghijklmnopqrstuvwxyz"), "log in"))]']
+    - ["CSS", "button[data-litms-control-urn='login-submit']"]
+  validation_errors:
+    - ["XPATH", ".//*[contains(@class,'artdeco-inline-feedback') or contains(@class,'fb-form-element__error') or contains(@class,'jobs-easy-apply-form-section__grouping')]//*[contains(text(),'Please') or contains(text(),'required')]"]
+    - ["XPATH", ".//*[contains(text(), 'Please make a selection')]"]
+  job_card_subtitle:
+    - ["CLASS", "artdeco-entity-lockup__subtitle"]
+
+# Static Constants (Not in registry)
+# These will be available as Selectors.NAME
+constants:
+  JOB_DETAILS_CONTAINER: "jobs-search__job-details--container"
+  PAGINATION_NEXT: "//button[@aria-label='Page {page}']"
+  JOB_TITLE: "job-card-list__title"
+  JOB_COMPANY: "job-card-container__company-name"
+  JOB_LOCATION: "job-card-container__metadata-item"
+  MODAL_CONTAINER: "jobs-easy-apply-modal"
+  QUESTION_RADIO: ".//fieldset[contains(@class, 'fb-radio')]"
+  QUESTION_TEXT: ".//input[@type='text']"
+  QUESTION_TEXTAREA: ".//textarea"
+  QUESTION_CHECKBOX: ".//input[@type='checkbox']"
+  QUESTION_SELECT: ".//select"
+  LOGIN_USERNAME_ID: "username"
+  LOGIN_PASSWORD_ID: "password"
+  SIGN_IN_LANDING_BUTTON: "//*[contains(@class, 'nav__button-secondary') or contains(@class, 'nav-link--signin')] | //a[contains(text(), 'Sign in')] | //button[contains(text(), 'Sign in')]"
+  JOB_CARD_SEPARATOR: " · "

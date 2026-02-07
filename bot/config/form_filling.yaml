@@ -1,0 +1,46 @@
+# Form Filling Heuristics and Mappings
+
+# 0. Global Settings
+settings:
+  modal_spawn_delay: 4
+  click_gap: 2
+  max_modal_steps: 12
+
+# 1. Identity Mappings: (Label Keywords -> Candidate YAML Keys)
+identity_mappings:
+  phone: ["phone", "mobile", "contact number"]
+  first_name: ["first name", "given name"]
+  last_name: ["last name", "family name", "surname"]
+  email: ["email", "e-mail"]
+
+# 2. Logic Mappings: (Label Keywords -> Candidate YAML Keys)
+logic_mappings:
+  require_visa: ["sponsorship", "visa", "work authorization", "authorized to work"]
+  us_citizenship: ["citizen", "clearance", "naturalized"]
+  comfortable_commuting: ["commute"]
+  open_to_relocate: ["relocate"]
+  willing_to_travel: ["travel"]
+  open_to_hybrid_remote: ["hybrid", "remote"]
+  years_of_experience: ["experience", "how many years"]
+  desired_salary: ["salary", "compensation", "expectation"]
+  zipcode: ["zipcode", "zip code", "postal"]
+  current_city: ["city", "current location"]
+
+# 3. Default Constant Mappings: (Label Keywords -> Constant Answer)
+constant_mappings:
+  "Yes": ["degree", "masters", "phd", "bachelors", "background check", "drug test", "screen"]
+
+# 4. Required Field Indicators: (Selectors or Text)
+required_indicators:
+  classes: ["required", "mandatory"]
+  text: ["*"]
+  attributes: ["aria-required", "required"]
+
+# 5. Screening Keywords (Skip jobs containing these)
+screening:
+  clearance_keywords:
+    - "polygraph"
+    - "clearance"
+    - "secret"
+    - "top secret"
+    - "sci"

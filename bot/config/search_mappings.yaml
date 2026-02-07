@@ -1,0 +1,45 @@
+# LinkedIn Search URL Filter Codes
+# These codes are used in the URL parameters (f_TPR, f_E, f_JT, f_WT)
+
+# 1. Date Posted (f_TPR)
+# Format: r + seconds (r86400 = 24h, r604800 = 7 days)
+date_posted:
+  "24": "r86400"
+  "day": "r86400"
+  "week": "r604800"
+  "past week": "r604800"
+  "month": "r2592000"
+  "past month": "r2592000"
+
+# 2. Experience Level (f_E)
+# 1: Internship, 2: Entry level, 3: Associate, 4: Mid-Senior, 5: Director, 6: Executive
+experience_level:
+  "internship": "1"
+  "entry level": "2"
+  "associate": "3"
+  "mid-senior level": "4"
+  "director": "5"
+  "executive": "6"
+
+# 3. Job Type (f_JT)
+# F: Full-time, P: Part-time, C: Contract, T: Temporary, V: Volunteer, I: Internship
+job_type:
+  "full-time": "F"
+  "part-time": "P"
+  "contract": "C"
+  "temporary": "T"
+  "volunteer": "V"
+  "internship": "I"
+
+# 4. Work Style / Work Type (f_WT)
+# 1: On-site, 2: Remote, 3: Hybrid
+work_style:
+  "on-site": "1"
+  "remote": "2"
+  "hybrid": "3"
+
+# 5. Sort By (sortBy)
+# DD: Most Recent, R: Relevancy
+sort_by:
+  "most recent": "DD"
+  "relevance": "R"
